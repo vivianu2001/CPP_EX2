@@ -10,12 +10,21 @@ namespace ariel
     class Graph
     {
     private:
-        std::vector<std::vector<int>> adjMatrix;
+        std::vector<std::vector<int>> adjacencyMatrix;
+        bool isDirected;
 
     public:
         // Graph management
-        void loadGraph(const std::vector<std::vector<int>> &matrix);
+        Graph(bool directed = false);
+        void loadGraph(const std::vector<std::vector<int>> &matrix, bool directed);
         std::string printGraph() const;
+        // Get a constant reference to the adjacency matrix
+        const std::vector<std::vector<int>> &getAdjacencyMatrix() const;
+
+        // Check if the graph is directed
+        bool getIsDirected() const;
+
+        bool NegativeEdges;
 
         // Arithmetic operators
         Graph operator+(const Graph &other) const;

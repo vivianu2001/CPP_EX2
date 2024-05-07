@@ -8,7 +8,7 @@ OBJECTS=$(SOURCES:.cpp=.o)
 
 run: demo
 		./demo
-demo: Demo.o Graph.o 
+demo: Demo.o Graph.o Algorithms.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 test: TestCounter.o Graph.o Algorithms.o Test.o
