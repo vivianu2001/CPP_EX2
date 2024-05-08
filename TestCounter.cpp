@@ -1,3 +1,4 @@
+#ifndef DOCTEST_CONFIG_IMPLEMENT
 #define DOCTEST_CONFIG_IMPLEMENT
 #include "doctest.h"
 using namespace doctest;
@@ -22,15 +23,17 @@ struct ReporterCounter : public ConsoleReporter
             std::cout << "Please write at least " << MIN_TESTS << " tests! " << std::endl;
             return_code = 1;
         }
+        ConsoleReporter::test_run_end(run_stats);
     }
 };
 
 REGISTER_REPORTER("counter", 1, ReporterCounter);
 
-int main(int argc, char **argv)
+int runTests()
 {
     Context context;
     context.addFilter("reporters", "counter");
     context.run();
     return return_code;
 }
+#endif
