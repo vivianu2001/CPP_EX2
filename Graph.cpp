@@ -317,19 +317,28 @@ namespace ariel
         return other > *this;
     }
 
-    bool Graph::isContained(const Graph &other) const
+ bool Graph::isContained(const Graph &other) const
+{
+    // Check if all edges in *this are contained in `other` with at least the same weights
+    for (size_t i = 0; i < adjacencyMatrix.size(); i++)
     {
-        // Check if all edges in *this are contained in `other` with at least the same weights
-        for (size_t i = 0; i < adjacencyMatrix.size(); i++)
+        for (size_t j = 0; j < adjacencyMatrix[i].size(); j++)
         {
-            for (size_t j = 0; j < adjacencyMatrix[i].size(); j++)
-            {
+            // Perform bounds check before accessing elements of other.adjacencyMatrix
+            if (i < other.adjacencyMatrix.size() && j < other.adjacencyMatrix[i].size()) {
                 if (adjacencyMatrix[i][j] > other.adjacencyMatrix[i][j])
                     return false;
+            } else {
+                // If (i, j) is out of bounds of other.adjacencyMatrix, it means that other does not have
+                // an edge at this position. Depending on your requirements, you may choose to handle this
+                // differently. For simplicity, we'll consider this a mismatch and return false.
+                return false;
             }
         }
-        return true;
     }
+    return true;
+}
+
 
     bool Graph::isContaining(const Graph &other) const
     {

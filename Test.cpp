@@ -241,26 +241,24 @@ TEST_CASE("Graph comparison operators")
 
 TEST_CASE("4")
 {
-    ariel::Graph g1;
-    vector<vector<int>> graph1 = {
+    ariel::Graph g4;
+    g4.loadGraph({
         {0, 1},
-        {1, 0}};
-    g1.loadGraph(graph1, false);
-    ariel::Graph g2;
-    vector<vector<int>> weightedGraph2 = {
+        {1, 0}}, false);
+    ariel::Graph g5;
+  
+    g5.loadGraph( {
         {0, 1},
-        {1, 0}};
-    g2.loadGraph(weightedGraph2, false);
-    ariel::Graph g3;
-    vector<vector<int>> graph3 = {
+        {1, 0}}, false);
+    ariel::Graph g6;
+    g6.loadGraph({
         {0, 1, 0},
         {1, 0, 1},
-        {0, 1, 0}};
-    g3.loadGraph(graph3, false);
-    CHECK(g1 >= g2);       // Should be true, as g1 and g2 are equal
-    CHECK(g2 <= g1);       // Should be true, as g2 and g1 are equal
-    CHECK_FALSE(g1 >= g3); // Should be false, as g3 is not equal or smaller in any sense compared to g1
-    CHECK(g3 > g1);        // Should be true if we consider g3 to have more nodes/edges
+        {0, 1, 0}}, false);
+    CHECK(g4 >= g5);       // Should be true, as g1 and g2 are equal
+    CHECK(g5 <= g4);       // Should be true, as g2 and g1 are equal
+    CHECK_FALSE(g4 >= g6); // Should be false, as g3 is not equal or smaller in any sense compared to g1
+    CHECK(g6 > g4);        // Should be true if we consider g3 to have more nodes/edges
 }
 
 TEST_CASE("5")
