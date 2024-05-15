@@ -330,9 +330,9 @@ namespace ariel
     bool Graph::operator>(const Graph &other) const
     {
         if (isContained(other))
-            return false;
-        if (isContaining(other))
             return true;
+        if (isContaining(other))
+            return false;
         int edges1 = countEdges();
         int edges2 = other.countEdges();
         if (edges1 != edges2)
@@ -347,27 +347,44 @@ namespace ariel
 
     bool Graph::isContained(const Graph &other) const
     {
-        // Check if all edges in *this are contained in `other` with at least the same weights
-        for (size_t i = 0; i < adjacencyMatrix.size(); i++)
+        if (*this == other)
         {
-            for (size_t j = 0; j < adjacencyMatrix[i].size(); j++)
+            return false;
+        }
+        size_t numOtherRows = other.adjacencyMatrix.size();
+        size_t numOtherCols = other.adjacencyMatrix[0].size();
+
+        // Ensure the 'other' matrix isn't larger than the 'this' matrix
+        if (numOtherRows > adjacencyMatrix.size() || (adjacencyMatrix.size() > 0 && numOtherCols > adjacencyMatrix[0].size()))
+        {
+            return false;
+        }
+
+        // Iterate over each potential starting row and column in 'this' adjacency matrix
+        for (size_t startRow = 0; startRow <= adjacencyMatrix.size() - numOtherRows; ++startRow)
+        {
+            for (size_t startCol = 0; startCol <= adjacencyMatrix[startRow].size() - numOtherCols; ++startCol)
             {
-                // Perform bounds check before accessing elements of other.adjacencyMatrix
-                if (i < other.adjacencyMatrix.size() && j < other.adjacencyMatrix[i].size())
+                // Check if the current set of rows and columns matches the smaller matrix
+                bool subMatrixMatch = true;
+                for (size_t i = 0; i < numOtherRows; ++i)
                 {
-                    if (adjacencyMatrix[i][j] > other.adjacencyMatrix[i][j])
-                        return false;
+                    for (size_t j = 0; j < numOtherCols; ++j)
+                    {
+                        if (adjacencyMatrix[startRow + i][startCol + j] != other.adjacencyMatrix[i][j])
+                        {
+                            subMatrixMatch = false;
+                            break;
+                        }
+                    }
+                    if (!subMatrixMatch)
+                        break; // Break out of the outer loop if a mismatch is found
                 }
-                else
-                {
-                    // If (i, j) is out of bounds of other.adjacencyMatrix, it means that other does not have
-                    // an edge at this position. Depending on your requirements, you may choose to handle this
-                    // differently. For simplicity, we'll consider this a mismatch and return false.
-                    return false;
-                }
+                if (subMatrixMatch)
+                    return true; // A matching sub-matrix has been found
             }
         }
-        return true;
+        return false; // No matching sub-matrix found
     }
 
     bool Graph::isContaining(const Graph &other) const
@@ -378,12 +395,12 @@ namespace ariel
 
     bool Graph::operator>=(const Graph &other) const
     {
-        return !(*this < other);
+        return !(*this < other) || (*this == other);
     }
 
     bool Graph::operator<=(const Graph &other) const
     {
-        return !(*this > other);
+        return !(*this > other) || (*this == other);
     }
     std::ostream &operator<<(std::ostream &os, const Graph &graph)
     {

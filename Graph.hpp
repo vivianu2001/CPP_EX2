@@ -50,9 +50,11 @@ namespace ariel
         bool operator<(const Graph &other) const;
         bool operator>=(const Graph &other) const;
         bool operator<=(const Graph &other) const;
+        int countEdges() const;
+
+    private:
         bool isContained(const Graph &other) const;
         bool isContaining(const Graph &other) const;
-        int countEdges() const;
 
         // Output operator
         friend std::ostream &operator<<(std::ostream &os, const Graph &graph);
