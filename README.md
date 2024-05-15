@@ -5,9 +5,9 @@
 
 ## Overview
 
-Welcome back to the extension of my first CPP assignment! Building on the initial Graph class implementation, this assignment extends functionality to include arithmetic and comparison operators,applied directly to graph representations using adjacency matrices.
+👋Welcome back to the extension of my first CPP assignment! Building on the initial Graph class implementation, this assignment extends functionality to include arithmetic and comparison operators,applied directly to graph representations using adjacency matrices.
 
-## Files
+## Files🗂️
 
 - **Graph.cpp**: Extends the initial `Graph` class by adding support for arithmetic and comparison operators.
 - **Algorithms.cpp**: Integrates the extended graph functionalities with the graph algorithms implemented in the previous assignment.
@@ -17,7 +17,7 @@ Welcome back to the extension of my first CPP assignment! Building on the initia
 
 ## Extended Graph Operations
 
-### Arithmetic Operators
+### Arithmetic Operators➗
 
 - **Addition (`+`, `+=`)** and **Subtraction (`-`, `-=`)**: Support for direct and compound operations on graphs of the same dimension.
 - **Unary Plus (`+`)** and **Negation (`-`)**: Unary operations to facilitate positive and negative forms of graphs.
