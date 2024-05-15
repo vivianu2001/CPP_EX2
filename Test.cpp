@@ -84,7 +84,7 @@ TEST_CASE("3-Invalid operations")
     // g6.loadGraph(graph3, false);
     CHECK_THROWS(g1 + g6);
 }
-TEST_CASE("Graph addition with larger matrices")
+TEST_CASE("4-Graph addition with larger matrices")
 {
     ariel::Graph g1;
     g1.loadGraph({{0, 2, 3, 4},
@@ -110,7 +110,7 @@ TEST_CASE("Graph addition with larger matrices")
     ariel::Graph result = g1 + g2;
     CHECK(result == expected);
 }
-TEST_CASE("Graph subtraction with larger matrices")
+TEST_CASE("5-Graph subtraction with larger matrices")
 {
     ariel::Graph g1;
     g1.loadGraph({{0, 4, 6, 4},
@@ -136,33 +136,8 @@ TEST_CASE("Graph subtraction with larger matrices")
     ariel::Graph result = g1 - g2;
     CHECK(result == expected);
 }
-TEST_CASE("Graph subtraction with larger matrices")
-{
-    ariel::Graph g1;
-    g1.loadGraph({{0, 4, 6, 4},
-                  {4, 0, 10, 2},
-                  {6, 10, 0, 4},
-                  {4, 2, 4, 0}},
-                 false);
 
-    ariel::Graph g2;
-    g2.loadGraph({{0, 2, 3, 2},
-                  {2, 0, 5, 1},
-                  {3, 5, 0, 2},
-                  {2, 1, 2, 0}},
-                 false);
-
-    ariel::Graph expected;
-    expected.loadGraph({{0, 2, 3, 2},
-                        {2, 0, 5, 1},
-                        {3, 5, 0, 2},
-                        {2, 1, 2, 0}},
-                       false);
-
-    ariel::Graph result = g1 - g2;
-    CHECK(result == expected);
-}
-TEST_CASE("Graph comparison operators")
+TEST_CASE("6-Graph comparison operators")
 {
     ariel::Graph g1;
     g1.loadGraph({{0, 3, 4},
@@ -178,7 +153,7 @@ TEST_CASE("Graph comparison operators")
 
     CHECK(g1 == g2); // They are the same
 }
-TEST_CASE("5-Graph with negative cycle")
+TEST_CASE("7-Graph with negative cycle")
 {
     ariel::Graph g;
     std::vector<std::vector<int>> graph = {
@@ -197,7 +172,7 @@ TEST_CASE("5-Graph with negative cycle")
     CHECK(ariel::Algorithms::isConnected(g) == true);
 }
 
-TEST_CASE("Graph comparison operators")
+TEST_CASE("8-Graph comparison operators")
 {
     ariel::Graph g1;
     g1.loadGraph({{0, 3, 4},
@@ -214,7 +189,7 @@ TEST_CASE("Graph comparison operators")
     CHECK(g1 == g2); // They are the same
 }
 
-TEST_CASE("Graph comparison operators")
+TEST_CASE("9-Graph comparison operators")
 {
     ariel::Graph g1;
     g1.loadGraph({{0, 3, 4},
@@ -239,29 +214,29 @@ TEST_CASE("Graph comparison operators")
     CHECK(g3 > g1);  // g3 has more edges
 }
 
-TEST_CASE("4")
+TEST_CASE("10")
 {
     ariel::Graph g4;
-    g4.loadGraph({
-        {0, 1},
-        {1, 0}}, false);
+    g4.loadGraph({{0, 1},
+                  {1, 0}},
+                 false);
     ariel::Graph g5;
-  
-    g5.loadGraph( {
-        {0, 1},
-        {1, 0}}, false);
+
+    g5.loadGraph({{0, 1},
+                  {1, 0}},
+                 false);
     ariel::Graph g6;
-    g6.loadGraph({
-        {0, 1, 0},
-        {1, 0, 1},
-        {0, 1, 0}}, false);
+    g6.loadGraph({{0, 1, 0},
+                  {1, 0, 1},
+                  {0, 1, 0}},
+                 false);
     CHECK(g4 >= g5);       // Should be true, as g1 and g2 are equal
     CHECK(g5 <= g4);       // Should be true, as g2 and g1 are equal
     CHECK_FALSE(g4 >= g6); // Should be false, as g3 is not equal or smaller in any sense compared to g1
     CHECK(g6 > g4);        // Should be true if we consider g3 to have more nodes/edges
 }
 
-TEST_CASE("5")
+TEST_CASE("11")
 {
     ariel::Graph g7;
     vector<vector<int>> graph7 = {
@@ -382,4 +357,269 @@ TEST_CASE("9-Clique-k6")
         {1, 1, 1, 1, 1, 1}};
     g12.loadGraph(graph12, false);
     CHECK(g12 < g11);
+}
+TEST_CASE("10-Weighted graph")
+{
+    ariel::Graph g11;
+    vector<vector<int>> graph11 = {
+        {0, 3, 0, 2, 0, 0, 0, 0, 4},
+        {3, 0, 0, 0, 0, 0, 0, 4, 0},
+        {0, 0, 0, 6, 0, 1, 0, 2, 0},
+        {2, 0, 6, 0, 1, 0, 0, 0, 0},
+        {0, 0, 0, 1, 0, 0, 0, 0, 8},
+        {0, 0, 1, 0, 0, 0, 8, 0, 0},
+        {0, 0, 0, 0, 0, 8, 0, 0, 0},
+        {0, 4, 2, 0, 0, 0, 0, 0, 0},
+        {4, 0, 0, 0, 8, 0, 0, 0, 0}};
+    g11.loadGraph(graph11, false);
+    CHECK(ariel::Algorithms::isConnected(g11) == true);
+    g11--;
+    CHECK(ariel::Algorithms::isConnected(g11) == false);
+}
+TEST_CASE("11-Test graph addition post decrement")
+{
+    ariel::Graph g1;
+    vector<vector<int>> graph = {
+        {0, 10, 0},
+        {10, 0, 10},
+        {0, 10, 0}};
+    g1.loadGraph(graph, false);
+    ariel::Graph g2;
+    vector<vector<int>> weightedGraph = {
+        {0, 1, 1},
+        {1, 0, 2},
+        {1, 2, 0}};
+    g2.loadGraph(weightedGraph, false);
+    ariel::Graph g3 = g1-- + g2;
+
+    CHECK(g3.printGraph() == "[0, 11, 1]\n[11, 0, 12]\n[1, 12, 0]");
+    CHECK(g1.printGraph() == "[0, 9, 0]\n[9, 0, 9]\n[0, 9, 0]");
+}
+
+TEST_CASE("11-Test graph addition pre decrement")
+{
+    ariel::Graph g1;
+    vector<vector<int>> graph = {
+        {0, 10, 0},
+        {10, 0, 10},
+        {0, 10, 0}};
+    g1.loadGraph(graph, false);
+    ariel::Graph g2;
+    vector<vector<int>> weightedGraph = {
+        {0, 1, 1},
+        {1, 0, 2},
+        {1, 2, 0}};
+    g2.loadGraph(weightedGraph, false);
+    ariel::Graph g3 = --g1 + g2;
+
+    CHECK(g3.printGraph() == "[0, 10, 1]\n[10, 0, 11]\n[1, 11, 0]");
+}
+TEST_CASE("12-Weighted graph")
+{
+    ariel::Graph g11;
+    vector<vector<int>> graph11 = {
+        {0, 3, 0, 2, 0, 0, 0, 0, 4},
+        {3, 0, 0, 0, 0, 0, 0, 4, 0},
+        {0, 0, 0, 6, 0, 1, 0, 2, 0},
+        {2, 0, 6, 0, 1, 0, 0, 0, 0},
+        {0, 0, 0, 1, 0, 0, 0, 0, 8},
+        {0, 0, 1, 0, 0, 0, 8, 0, 0},
+        {0, 0, 0, 0, 0, 8, 0, 0, 0},
+        {0, 4, 2, 0, 0, 0, 0, 0, 0},
+        {4, 0, 0, 0, 8, 0, 0, 0, 0}};
+    g11.loadGraph(graph11, false);
+    CHECK(ariel::Algorithms::shortestPath(g11, 3, 4) == "3->4");
+    g11--;
+    CHECK(ariel::Algorithms::shortestPath(g11, 3, 4) == "3->0->8->4");
+}
+TEST_CASE("12-Weighted graph")
+{
+    ariel::Graph g11;
+    vector<vector<int>> graph11 = {
+        {0, 3, 0, 2, 0, 0, 0, 0, 4},
+        {3, 0, 0, 0, 0, 0, 0, 4, 0},
+        {0, 0, 0, 6, 0, 1, 0, 2, 0},
+        {2, 0, 6, 0, 1, 0, 0, 0, 0},
+        {0, 0, 0, 1, 0, 0, 0, 0, 8},
+        {0, 0, 1, 0, 0, 0, 8, 0, 0},
+        {0, 0, 0, 0, 0, 8, 0, 0, 0},
+        {0, 4, 2, 0, 0, 0, 0, 0, 0},
+        {4, 0, 0, 0, 8, 0, 0, 0, 0}};
+    g11.loadGraph(graph11, false);
+    CHECK(ariel::Algorithms::shortestPath(g11, 5, 6) == "5->6");
+    g11--;
+    CHECK(ariel::Algorithms::shortestPath(g11, 5, 1) == "No path available");
+    CHECK(ariel::Algorithms::shortestPath(g11, 6, 8) == "No path available");
+}
+TEST_CASE("13-Directed graph")
+{
+    ariel::Graph g11;
+    vector<vector<int>> graph11 = {
+        {0, 0, 12, 60, 0},
+        {10, 0, 0, 0, 0},
+        {0, 20, 0, 32, 0},
+        {0, 0, 0, 0, 0},
+        {7, 0, 0, 0, 0}};
+    g11.loadGraph(graph11, true);
+    CHECK(ariel::Algorithms::negativeCycle(g11) == "No negative cycle found");
+    CHECK(ariel::Algorithms::isBipartite(g11) == "The graph is not bipartite.");
+    CHECK(ariel::Algorithms::isContainsCycle(g11) == "The cycle is: 0->2->1->0");
+    CHECK(ariel::Algorithms::isConnected(g11) == false);
+
+    ariel::Graph g12;
+    g12 = -g11;
+    CHECK(ariel::Algorithms::negativeCycle(g12) == "Negative cycle found: 2->1->0->2");
+    CHECK(ariel::Algorithms::isBipartite(g12) == "The graph is not bipartite.");
+    CHECK(ariel::Algorithms::isConnected(g12) == false);
+}
+TEST_CASE("14-Directed graph")
+{
+    ariel::Graph g11;
+    vector<vector<int>> graph11 = {
+        {0, 0, 12, 60, 0},
+        {10, 0, 0, 0, 0},
+        {0, 20, 0, 32, 0},
+        {0, 0, 0, 0, 0},
+        {7, 0, 0, 0, 0}};
+    g11.loadGraph(graph11, true);
+    CHECK(ariel::Algorithms::negativeCycle(g11) == "No negative cycle found");
+    CHECK(ariel::Algorithms::isBipartite(g11) == "The graph is not bipartite.");
+    CHECK(ariel::Algorithms::isContainsCycle(g11) == "The cycle is: 0->2->1->0");
+    CHECK(ariel::Algorithms::isConnected(g11) == false);
+
+    ariel::Graph g12;
+    g12 = +g11;
+    CHECK(ariel::Algorithms::negativeCycle(g12) == "No negative cycle found");
+    CHECK(ariel::Algorithms::isBipartite(g12) == "The graph is not bipartite.");
+    CHECK(ariel::Algorithms::isContainsCycle(g11) == "The cycle is: 0->2->1->0");
+    CHECK(ariel::Algorithms::isConnected(g12) == false);
+}
+TEST_CASE("Graph subtraction assignment operator")
+{
+    // Setting up the initial graphs
+    ariel::Graph g1;
+    vector<vector<int>> matrix1 = {
+        {5, 2, 3},
+        {0, 4, 6},
+        {7, 0, 1}};
+    g1.loadGraph(matrix1, true); // Assuming this is a directed graph
+
+    ariel::Graph g2;
+    vector<vector<int>> matrix2 = {
+        {1, 2, 1},
+        {0, 1, 3},
+        {4, 0, 1}};
+    g2.loadGraph(matrix2, true); // Same directed status for compatibility
+
+    g1 -= g2; // Apply subtraction assignment
+    vector<vector<int>> expectedMatrix = {
+        {4, 0, 2},
+        {0, 3, 3},
+        {3, 0, 0}};
+    CHECK(g1.getAdjacencyMatrix() == expectedMatrix);
+}
+TEST_CASE("Graph addition assignment operator")
+{
+    // Setting up the initial graphs
+    ariel::Graph g1;
+    vector<vector<int>> matrix1 = {
+        {3, 5, 7},
+        {2, 6, 1},
+        {0, 4, 8}};
+    g1.loadGraph(matrix1, true); // Assume this graph is directed
+
+    ariel::Graph g2;
+    vector<vector<int>> matrix2 = {
+        {2, 3, 4},
+        {1, 1, 0},
+        {6, 0, 2}};
+    g2.loadGraph(matrix2, true); // Same directed status for compatibility
+
+    g1 += g2; // Apply addition assignment
+    vector<vector<int>> expectedMatrix = {
+        {5, 8, 11},
+        {3, 7, 1},
+        {6, 4, 10}};
+    CHECK(g1.getAdjacencyMatrix() == expectedMatrix);
+}
+TEST_CASE("Graph scalar multiplication assignment operator")
+{
+    // Setup the initial graph
+    ariel::Graph g1;
+    vector<vector<int>> matrix1 = {
+        {1, 2, 3},
+        {4, 5, 6},
+        {7, 8, 9}};
+    g1.loadGraph(matrix1, true); // Assume this graph is directed
+
+    int scalar = 3;
+    g1 *= scalar; // Apply multiplication assignment
+    vector<vector<int>> expectedMatrix1 = {
+        {3, 6, 9},
+        {12, 15, 18},
+        {21, 24, 27}};
+    CHECK(g1.getAdjacencyMatrix() == expectedMatrix1);
+
+    int scalar1 = 0;
+    g1 *= scalar1; // Multiply the matrix by zero
+    vector<vector<int>> expectedMatrix2 = {
+        {0, 0, 0},
+        {0, 0, 0},
+        {0, 0, 0}};
+    CHECK(g1.getAdjacencyMatrix() == expectedMatrix2);
+
+    // int scalar2 = -1;
+    // g1 *= scalar2; // Multiply the matrix by -1
+    // vector<vector<int>> expectedMatrix3 = {
+    //     {-1, -2, -3},
+    //     {-4, -5, -6},
+    //     {-7, -8, -9}};
+    // CHECK(g1.getAdjacencyMatrix() == expectedMatrix3);
+
+    bool originalDirectedness = g1.getIsDirected();
+    // int scalar3 = 5;
+    // g1 *= scalar3;
+    CHECK(g1.getIsDirected() == originalDirectedness);
+}
+
+TEST_CASE("Graph comparison operators")
+{
+    // Setup the initial graphs
+    ariel::Graph g1;
+    vector<vector<int>> matrix1 = {
+        {1, 2, 3},
+        {0, 1, 4},
+        {0, 0, 1}};
+    g1.loadGraph(matrix1, true); // Directed graph
+
+    ariel::Graph g2;
+    vector<vector<int>> matrix2 = {
+        {1, 2, 3},
+        {0, 1, 4},
+        {0, 0, 1}};
+    g2.loadGraph(matrix2, true); // Identical to g1
+
+    ariel::Graph g3;
+    vector<vector<int>> matrix3 = {
+        {1, 2, 0},
+        {0, 1, 0},
+        {0, 0, 1}};
+    g3.loadGraph(matrix3, true); // Different from g1 and g2
+
+    CHECK(g1 == g2);
+    CHECK_FALSE(g1 == g3);
+    CHECK(g1 != g3);
+    CHECK_FALSE(g1 != g2);
+
+    CHECK(g1.isContaining(g3));       // g1 should contain g3
+    CHECK_FALSE(g3.isContaining(g1)); // g3 does not contain g1
+    CHECK(g3.isContained(g1));        // g3 is contained within g1
+    CHECK_FALSE(g1.isContained(g3));  // g1 is not contained within g3
+
+    CHECK(g1 >= g2);      // g1 is equal to g2
+    CHECK(g1 <= g2);      // g1 is equal to g2
+    CHECK(g1 > g3);       // g1 has more edges
+    CHECK(g3 < g1);       // g3 has fewer edges
+    CHECK_FALSE(g3 > g1); // g3 does not have more edges than g1
+    CHECK_FALSE(g1 < g2); // g1 is not less than g2
 }

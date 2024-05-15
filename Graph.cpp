@@ -4,7 +4,8 @@
 
 namespace ariel
 {
-    Graph::Graph(bool directed) : isDirected(directed) {}
+    Graph::Graph() {}
+
     void Graph::loadGraph(const std::vector<std::vector<int>> &matrix, bool directed)
     {
         // Load the graph from the given adjacency matrix
@@ -76,19 +77,26 @@ namespace ariel
                 {
                     edges++;
                 }
-                if (adjacencyMatrix[i][j] != 0)
+                else
                 {
-                    edges++;
+                    if (adjacencyMatrix[i][j] != 0)
+                    {
+                        edges++;
+                    }
                 }
             }
         }
-        return (isDirected ? edges : edges / 2); // Divide by 2 for undirected graphs
+        return (edges);
     }
 
     // Check if the graph is directed
     bool Graph::getIsDirected() const
     {
         return isDirected;
+    }
+    bool Graph::getIsNegativeEdges() const
+    {
+        return NegativeEdges;
     }
 
     std::string Graph::printGraph() const
@@ -282,6 +290,26 @@ namespace ariel
         }
         return result;
     }
+    Graph Graph::operator+() const
+    {
+        // Returns a copy of the graph as it is
+        Graph result = *this;
+        return result;
+    }
+    Graph Graph::operator-() const
+    {
+        Graph result;
+        result.adjacencyMatrix.resize(adjacencyMatrix.size(), std::vector<int>(adjacencyMatrix.size(), 0));
+        result.isDirected = isDirected;
+        for (size_t i = 0; i < adjacencyMatrix.size(); i++)
+        {
+            for (size_t j = 0; j < adjacencyMatrix[i].size(); j++)
+            {
+                result.adjacencyMatrix[i][j] = -adjacencyMatrix[i][j];
+            }
+        }
+        return result;
+    }
 
     bool Graph::operator==(const Graph &other) const
     {
@@ -317,28 +345,30 @@ namespace ariel
         return other > *this;
     }
 
- bool Graph::isContained(const Graph &other) const
-{
-    // Check if all edges in *this are contained in `other` with at least the same weights
-    for (size_t i = 0; i < adjacencyMatrix.size(); i++)
+    bool Graph::isContained(const Graph &other) const
     {
-        for (size_t j = 0; j < adjacencyMatrix[i].size(); j++)
+        // Check if all edges in *this are contained in `other` with at least the same weights
+        for (size_t i = 0; i < adjacencyMatrix.size(); i++)
         {
-            // Perform bounds check before accessing elements of other.adjacencyMatrix
-            if (i < other.adjacencyMatrix.size() && j < other.adjacencyMatrix[i].size()) {
-                if (adjacencyMatrix[i][j] > other.adjacencyMatrix[i][j])
+            for (size_t j = 0; j < adjacencyMatrix[i].size(); j++)
+            {
+                // Perform bounds check before accessing elements of other.adjacencyMatrix
+                if (i < other.adjacencyMatrix.size() && j < other.adjacencyMatrix[i].size())
+                {
+                    if (adjacencyMatrix[i][j] > other.adjacencyMatrix[i][j])
+                        return false;
+                }
+                else
+                {
+                    // If (i, j) is out of bounds of other.adjacencyMatrix, it means that other does not have
+                    // an edge at this position. Depending on your requirements, you may choose to handle this
+                    // differently. For simplicity, we'll consider this a mismatch and return false.
                     return false;
-            } else {
-                // If (i, j) is out of bounds of other.adjacencyMatrix, it means that other does not have
-                // an edge at this position. Depending on your requirements, you may choose to handle this
-                // differently. For simplicity, we'll consider this a mismatch and return false.
-                return false;
+                }
             }
         }
+        return true;
     }
-    return true;
-}
-
 
     bool Graph::isContaining(const Graph &other) const
     {

@@ -3,7 +3,7 @@
 #define GRAPH_HPP
 #include <vector>
 #include <string>
-#include <iostream> // For std::ostream
+#include <iostream>
 
 namespace ariel
 {
@@ -12,10 +12,11 @@ namespace ariel
     private:
         std::vector<std::vector<int>> adjacencyMatrix;
         bool isDirected;
+        bool NegativeEdges;
 
     public:
-        // Graph management
-        Graph(bool directed = false);
+        // Graph managementד
+        Graph();
         void loadGraph(const std::vector<std::vector<int>> &matrix, bool directed);
         std::string printGraph() const;
         // Get a constant reference to the adjacency matrix
@@ -24,11 +25,13 @@ namespace ariel
         // Check if the graph is directed
         bool getIsDirected() const;
 
-        bool NegativeEdges;
+        bool getIsNegativeEdges() const;
 
         // Arithmetic operators
         Graph operator+(const Graph &other) const;
+        Graph operator+() const;
         Graph operator-(const Graph &other) const;
+        Graph operator-() const;
         Graph &operator+=(const Graph &other);
         Graph &operator-=(const Graph &other);
         Graph &operator*=(int scalar);
