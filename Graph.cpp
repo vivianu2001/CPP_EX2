@@ -387,16 +387,12 @@ namespace ariel
     }
     std::ostream &operator<<(std::ostream &os, const Graph &graph)
     {
-        os << "Adjacency Matrix:\n";
-        for (const auto &row : graph.adjacencyMatrix)
-        {
-            os << "[ ";
-            for (int val : row)
-            {
-                os << val << " ";
-            }
-            os << "]\n";
-        }
+        int numEdges = graph.countEdges();
+        int numVertices = graph.adjacencyMatrix.size();
+
+        os << "Graph with " << numVertices << " vertices and " << numEdges << " edges.\n";
+        os << "The graph is " << (graph.isDirected ? "directed." : "undirected.") << "\n";
+
         return os;
     }
 
