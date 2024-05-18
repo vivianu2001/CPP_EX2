@@ -14,13 +14,15 @@ namespace ariel
         bool isDirected;
         bool NegativeEdges;
         int edgeCount;
+        bool isContained(const Graph &other) const;
+        bool isContaining(const Graph &other) const;
+        int countEdges();
+        void checkCompatibility(const Graph &other) const;
 
     public:
-        // Graph management
         Graph();
         void loadGraph(const std::vector<std::vector<int>> &matrix, bool directed);
         std::string printGraph() const;
-        // Get a constant reference to the adjacency matrix
         const std::vector<std::vector<int>> &getAdjacencyMatrix() const;
 
         // Check if the graph is directed
@@ -51,11 +53,7 @@ namespace ariel
         bool operator<(const Graph &other) const;
         bool operator>=(const Graph &other) const;
         bool operator<=(const Graph &other) const;
-        int countEdges();
-
-    private:
-        bool isContained(const Graph &other) const;
-        bool isContaining(const Graph &other) const;
+        
 
         // Output operator
         friend std::ostream &operator<<(std::ostream &os, const Graph &graph);

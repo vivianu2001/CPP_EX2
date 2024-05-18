@@ -4,105 +4,89 @@
 
 namespace ariel
 {
-    Graph::Graph() {}
-
+    Graph::Graph() : isDirected(false), NegativeEdges(false), edgeCount(0)
+    {
+    }
     void Graph::loadGraph(const std::vector<std::vector<int>> &matrix, bool directed)
     {
-        isDirected = directed;
-
         if (matrix.empty())
         {
-            adjacencyMatrix.clear();
-            edgeCount = 0; // Reset edge count as well
-            return;
+            throw std::invalid_argument("The adjacency matrix is empty.");
         }
 
         size_t size = matrix.size();
-        for (const auto &row : matrix)
+        for (size_t i = 0; i < size; ++i)
         {
-            if (row.size() != size)
+            if (matrix[i].size() != size)
             {
                 throw std::invalid_argument("The adjacency matrix must be square.");
             }
-        }
 
-        if (!isDirected)
-        {
-            for (size_t i = 0; i < size; i++)
+            for (size_t j = (directed ? 0 : i); j < size; ++j)
             {
-                for (size_t j = 0; j < i; j++)
+                if ((i == j) && matrix[i][j] != 0)
                 {
-                    if (matrix[i][j] != matrix[j][i])
-                    {
-                        throw std::invalid_argument("Matrix must be symmetric for undirected graphs");
-                    }
+                    throw std::invalid_argument("No self-loops allowed.");
                 }
-            }
-        }
-
-        NegativeEdges = false;
-        for (size_t i = 0; i < size; ++i)
-        {
-            for (size_t j = 0; j < size; ++j)
-            {
                 if (matrix[i][j] < 0)
                 {
                     NegativeEdges = true;
-                    break;
+                }
+                if (!directed && matrix[i][j] != matrix[j][i])
+                {
+                    throw std::invalid_argument("Matrix must be symmetric for undirected graphs.");
                 }
             }
-            if (NegativeEdges)
-                break; // Exit early if any negative weight found
         }
 
+        // If validation is successful, update the graph state
+        isDirected = directed;
         adjacencyMatrix = matrix;
-        edgeCount = countEdges(); // Make sure countEdges returns int and calculates correctly
+        edgeCount = countEdges();
     }
-
     const std::vector<std::vector<int>> &Graph::getAdjacencyMatrix() const
     {
         return adjacencyMatrix;
     }
 
-int Graph::countEdges()
-{
-    int edges = 0;
-    size_t size = adjacencyMatrix.size();
-
-    // Adjust starting index for undirected graphs to only count the upper triangle
-    for (size_t i = 0; i < size; ++i)
+    int Graph::countEdges()
     {
-        size_t start_j = isDirected ? 0 : i;  // Start from 0 if directed, from i if undirected
-        for (size_t j = start_j; j < size; ++j)
+        int edges = 0;
+        size_t size = adjacencyMatrix.size();
+
+        // Adjust starting index for undirected graphs to only count the upper triangle
+        for (size_t i = 0; i < size; ++i)
         {
-            if (adjacencyMatrix[i][j] != 0)
+            size_t start_j = isDirected ? 0 : i; // Start from 0 if directed, from i if undirected
+            for (size_t j = start_j; j < size; ++j)
             {
-                edges++;
-                if (adjacencyMatrix[i][j] < 0)
+                if (adjacencyMatrix[i][j] != 0)
                 {
-                    NegativeEdges = true;
+                    edges++;
+                    if (adjacencyMatrix[i][j] < 0)
+                    {
+                        NegativeEdges = true;
+                    }
                 }
-            }
-            // Check the symmetric element only if it's an undirected graph and i != j
-            if (!isDirected && i != j && adjacencyMatrix[j][i] != 0 && adjacencyMatrix[j][i] != adjacencyMatrix[i][j])
-            {
-                edges++;
-                if (adjacencyMatrix[j][i] < 0)
+                // Check the symmetric element only if it's an undirected graph and i != j
+                if (!isDirected && i != j && adjacencyMatrix[j][i] != 0 && adjacencyMatrix[j][i] != adjacencyMatrix[i][j])
                 {
-                    NegativeEdges = true;
+                    edges++;
+                    if (adjacencyMatrix[j][i] < 0)
+                    {
+                        NegativeEdges = true;
+                    }
                 }
             }
         }
+        return edges;
     }
-    return edges;
-}
 
     int Graph::getEdgeCount() const
     {
         return edgeCount;
     }
 
-    // Check if the graph is directed
     bool Graph::getIsDirected() const
     {
         return isDirected;
@@ -134,25 +118,33 @@ int Graph::countEdges()
         }
         return oss.str();
     }
-
-    Graph Graph::operator+(const Graph &other) const
+    void Graph::checkCompatibility(const Graph &other) const
     {
         if (isDirected != other.isDirected)
         {
-            throw std::invalid_argument("Both graphs must be either directed or undirected to add");
+            throw std::invalid_argument("Both graphs must be either directed or undirected.");
         }
         if (adjacencyMatrix.size() != other.adjacencyMatrix.size())
         {
-            throw std::invalid_argument("Graphs must be of the same size to add");
+            throw std::invalid_argument("Graphs must be of the same size.");
         }
+        for (size_t i = 0; i < adjacencyMatrix.size(); ++i)
+        {
+            if (adjacencyMatrix[i].size() != other.adjacencyMatrix[i].size())
+            {
+                throw std::invalid_argument("Graph rows must be of the same length.");
+            }
+        }
+    }
+
+    Graph Graph::operator+(const Graph &other) const
+    {
+        checkCompatibility(other);
+
         Graph result;
         result.adjacencyMatrix.resize(adjacencyMatrix.size());
         for (size_t i = 0; i < adjacencyMatrix.size(); i++)
         {
-            if (adjacencyMatrix[i].size() != other.adjacencyMatrix[i].size())
-            {
-                throw std::invalid_argument("Graph rows must be of the same length");
-            }
             result.adjacencyMatrix[i].resize(adjacencyMatrix[i].size());
             for (size_t j = 0; j < adjacencyMatrix[i].size(); j++)
             {
@@ -167,22 +159,12 @@ int Graph::countEdges()
     // Graph operator- (Subtraction)
     Graph Graph::operator-(const Graph &other) const
     {
-        if (isDirected != other.isDirected)
-        {
-            throw std::invalid_argument("Both graphs must be either directed or undirected to add");
-        }
-        if (adjacencyMatrix.size() != other.adjacencyMatrix.size())
-        {
-            throw std::invalid_argument("Graphs must be of the same size to subtract");
-        }
+        checkCompatibility(other);
         Graph result;
         result.adjacencyMatrix.resize(adjacencyMatrix.size());
         for (size_t i = 0; i < adjacencyMatrix.size(); i++)
         {
-            if (adjacencyMatrix[i].size() != other.adjacencyMatrix[i].size())
-            {
-                throw std::invalid_argument("Graph rows must be of the same length");
-            }
+
             result.adjacencyMatrix[i].resize(adjacencyMatrix[i].size());
             for (size_t j = 0; j < adjacencyMatrix[i].size(); j++)
             {
@@ -197,22 +179,16 @@ int Graph::countEdges()
     // Graph operator-= (Subtraction Assignment)
     Graph &Graph::operator-=(const Graph &other)
     {
-        if (adjacencyMatrix.size() != other.adjacencyMatrix.size())
-        {
-            throw std::invalid_argument("Graphs must be of the same size to subtract");
-        }
+        checkCompatibility(other);
+        
         for (size_t i = 0; i < adjacencyMatrix.size(); i++)
         {
-            if (adjacencyMatrix[i].size() != other.adjacencyMatrix[i].size())
-            {
-                throw std::invalid_argument("Graph rows must be of the same length");
-            }
             for (size_t j = 0; j < adjacencyMatrix[i].size(); j++)
             {
                 adjacencyMatrix[i][j] -= other.adjacencyMatrix[i][j];
             }
         }
-        this->edgeCount=this->countEdges();
+        this->edgeCount = this->countEdges();
         return *this;
     }
     /// Pre-increment
@@ -228,7 +204,7 @@ int Graph::countEdges()
                 }
             }
         }
-        this->edgeCount=this->countEdges();
+        this->edgeCount = this->countEdges();
         return *this;
     }
 
@@ -253,7 +229,7 @@ int Graph::countEdges()
                 }
             }
         }
-          this->edgeCount=this->countEdges();
+        this->edgeCount = this->countEdges();
         return *this;
     }
 
@@ -267,22 +243,15 @@ int Graph::countEdges()
 
     Graph &Graph::operator+=(const Graph &other)
     {
-        if (adjacencyMatrix.size() != other.adjacencyMatrix.size())
-        {
-            throw std::invalid_argument("Graphs must be of the same size to add");
-        }
+        checkCompatibility(other);
         for (size_t i = 0; i < adjacencyMatrix.size(); i++)
         {
-            if (adjacencyMatrix[i].size() != other.adjacencyMatrix[i].size())
-            {
-                throw std::invalid_argument("Graph rows must be of the same length");
-            }
             for (size_t j = 0; j < adjacencyMatrix[i].size(); j++)
             {
                 adjacencyMatrix[i][j] += other.adjacencyMatrix[i][j];
             }
         }
-         this->edgeCount=this->countEdges();
+        this->edgeCount = this->countEdges();
         return *this;
     }
     Graph &Graph::operator*=(int scalar)
@@ -294,20 +263,12 @@ int Graph::countEdges()
                 adjacencyMatrix[i][j] *= scalar; // Directly modify the matrix
             }
         }
-         this->edgeCount=this->countEdges();
+        this->edgeCount = this->countEdges();
         return *this;
-
     }
     Graph Graph::operator*(const Graph &other) const
     {
-            if (isDirected != other.isDirected)
-        {
-            throw std::invalid_argument("Both graphs must be either directed or undirected to add");
-        }
-        if (adjacencyMatrix.size() != other.adjacencyMatrix.size())
-        {
-            throw std::invalid_argument("Graphs must be of the same dimension to multiply");
-        }
+        checkCompatibility(other);
         Graph result;
         size_t n = adjacencyMatrix.size();
         result.adjacencyMatrix.resize(n, std::vector<int>(n, 0)); // Initialize result matrix
@@ -318,14 +279,16 @@ int Graph::countEdges()
             {
                 for (size_t k = 0; k < n; k++)
                 {
+                   
+
                     result.adjacencyMatrix[i][j] += adjacencyMatrix[i][k] * other.adjacencyMatrix[k][j];
                 }
                 // Ensuring the diagonal is always zero
                 result.adjacencyMatrix[i][i] = 0;
             }
         }
-        
-          result.isDirected = isDirected;
+
+        result.isDirected = isDirected;
         result.edgeCount = result.countEdges();
         return result;
     }
@@ -348,7 +311,7 @@ int Graph::countEdges()
                 result.adjacencyMatrix[i][j] = -adjacencyMatrix[i][j];
             }
         }
-            result.isDirected = isDirected;
+        result.isDirected = isDirected;
         result.edgeCount = result.countEdges();
         return result;
     }
