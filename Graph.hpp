@@ -13,9 +13,10 @@ namespace ariel
         std::vector<std::vector<int>> adjacencyMatrix;
         bool isDirected;
         bool NegativeEdges;
+        int edgeCount;
 
     public:
-        // Graph managementד
+        // Graph management
         Graph();
         void loadGraph(const std::vector<std::vector<int>> &matrix, bool directed);
         std::string printGraph() const;
@@ -26,7 +27,7 @@ namespace ariel
         bool getIsDirected() const;
 
         bool getIsNegativeEdges() const;
-
+        int getEdgeCount() const;
         // Arithmetic operators
         Graph operator+(const Graph &other) const;
         Graph operator+() const;
@@ -50,7 +51,7 @@ namespace ariel
         bool operator<(const Graph &other) const;
         bool operator>=(const Graph &other) const;
         bool operator<=(const Graph &other) const;
-        int countEdges() const;
+        int countEdges();
 
     private:
         bool isContained(const Graph &other) const;

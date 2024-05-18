@@ -61,7 +61,7 @@ TEST_CASE("3-Invalid operations")
         {0, 1, 1, 1},
         {1, 0, 2, 1},
         {1, 2, 0, 1}};
-    // g2.loadGraph(weightedGraph, false);
+    g2.loadGraph(weightedGraph, false);
     ariel::Graph g5;
     vector<vector<int>> graph2 = {
         {0, 1, 0, 0, 1},
@@ -70,8 +70,10 @@ TEST_CASE("3-Invalid operations")
         {0, 0, 1, 0, 1},
         {1, 0, 0, 1, 0}};
     g5.loadGraph(graph2, false);
+
     CHECK_THROWS(g5 * g1);
     CHECK_THROWS(g1 * g2);
+
 
     // Addition of two graphs with different dimensions
     ariel::Graph g6;
@@ -84,6 +86,7 @@ TEST_CASE("3-Invalid operations")
     // g6.loadGraph(graph3, false);
     CHECK_THROWS(g1 + g6);
 }
+
 TEST_CASE("4-Graph addition with larger matrices")
 {
     ariel::Graph g1;

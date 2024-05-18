@@ -8,18 +8,16 @@ namespace ariel
 
     void Graph::loadGraph(const std::vector<std::vector<int>> &matrix, bool directed)
     {
-        // Load the graph from the given adjacency matrix
         isDirected = directed;
 
-        // Check if the matrix is empty
         if (matrix.empty())
         {
             adjacencyMatrix.clear();
+            edgeCount = 0; // Reset edge count as well
             return;
         }
 
-        // Check if the matrix is square
-        size_t size = matrix.size(); // number of rows
+        size_t size = matrix.size();
         for (const auto &row : matrix)
         {
             if (row.size() != size)
@@ -28,13 +26,12 @@ namespace ariel
             }
         }
 
-        // If the graph is undirected, check for symmetry
         if (!isDirected)
         {
             for (size_t i = 0; i < size; i++)
             {
                 for (size_t j = 0; j < i; j++)
-                { // Check only half as matrix should be symmetric
+                {
                     if (matrix[i][j] != matrix[j][i])
                     {
                         throw std::invalid_argument("Matrix must be symmetric for undirected graphs");
@@ -42,7 +39,8 @@ namespace ariel
                 }
             }
         }
-        // Check for negative weights
+
+        NegativeEdges = false;
         for (size_t i = 0; i < size; ++i)
         {
             for (size_t j = 0; j < size; ++j)
@@ -50,43 +48,58 @@ namespace ariel
                 if (matrix[i][j] < 0)
                 {
                     NegativeEdges = true;
+                    break;
                 }
             }
+            if (NegativeEdges)
+                break; // Exit early if any negative weight found
         }
 
-        NegativeEdges = false; // If we reach here, there are no negative edges
-
         adjacencyMatrix = matrix;
+        edgeCount = countEdges(); // Make sure countEdges returns int and calculates correctly
     }
+
     const std::vector<std::vector<int>> &Graph::getAdjacencyMatrix() const
     {
         return adjacencyMatrix;
     }
 
-    int Graph::countEdges() const
+int Graph::countEdges()
+{
+    int edges = 0;
+    size_t size = adjacencyMatrix.size();
+
+    // Adjust starting index for undirected graphs to only count the upper triangle
+    for (size_t i = 0; i < size; ++i)
     {
-        int edges = 0;
-        size_t size = adjacencyMatrix.size();
-        for (size_t i = 0; i < size; ++i)
+        size_t start_j = isDirected ? 0 : i;  // Start from 0 if directed, from i if undirected
+        for (size_t j = start_j; j < size; ++j)
         {
-            for (size_t j = (isDirected ? 0 : i + 1); j < size; ++j)
+            if (adjacencyMatrix[i][j] != 0)
             {
-                // For directed graphs, count all non-zero edges
-                // For undirected graphs, count only the upper triangular matrix
-                if (!isDirected && i != j && adjacencyMatrix[j][i] != 0)
+                edges++;
+                if (adjacencyMatrix[i][j] < 0)
                 {
-                    edges++;
+                    NegativeEdges = true;
                 }
-                else
+            }
+            // Check the symmetric element only if it's an undirected graph and i != j
+            if (!isDirected && i != j && adjacencyMatrix[j][i] != 0 && adjacencyMatrix[j][i] != adjacencyMatrix[i][j])
+            {
+                edges++;
+                if (adjacencyMatrix[j][i] < 0)
                 {
-                    if (adjacencyMatrix[i][j] != 0)
-                    {
-                        edges++;
-                    }
+                    NegativeEdges = true;
                 }
             }
         }
-        return (edges);
+    }
+    return edges;
+}
+
+    int Graph::getEdgeCount() const
+    {
+        return edgeCount;
     }
 
     // Check if the graph is directed
@@ -124,6 +137,10 @@ namespace ariel
 
     Graph Graph::operator+(const Graph &other) const
     {
+        if (isDirected != other.isDirected)
+        {
+            throw std::invalid_argument("Both graphs must be either directed or undirected to add");
+        }
         if (adjacencyMatrix.size() != other.adjacencyMatrix.size())
         {
             throw std::invalid_argument("Graphs must be of the same size to add");
@@ -142,11 +159,18 @@ namespace ariel
                 result.adjacencyMatrix[i][j] = adjacencyMatrix[i][j] + other.adjacencyMatrix[i][j];
             }
         }
+        result.isDirected = isDirected;
+        result.edgeCount = result.countEdges();
+
         return result;
     }
     // Graph operator- (Subtraction)
     Graph Graph::operator-(const Graph &other) const
     {
+        if (isDirected != other.isDirected)
+        {
+            throw std::invalid_argument("Both graphs must be either directed or undirected to add");
+        }
         if (adjacencyMatrix.size() != other.adjacencyMatrix.size())
         {
             throw std::invalid_argument("Graphs must be of the same size to subtract");
@@ -165,6 +189,8 @@ namespace ariel
                 result.adjacencyMatrix[i][j] = adjacencyMatrix[i][j] - other.adjacencyMatrix[i][j];
             }
         }
+        result.isDirected = isDirected;
+        result.edgeCount = result.countEdges();
         return result;
     }
 
@@ -186,6 +212,7 @@ namespace ariel
                 adjacencyMatrix[i][j] -= other.adjacencyMatrix[i][j];
             }
         }
+        this->edgeCount=this->countEdges();
         return *this;
     }
     /// Pre-increment
@@ -201,6 +228,7 @@ namespace ariel
                 }
             }
         }
+        this->edgeCount=this->countEdges();
         return *this;
     }
 
@@ -225,6 +253,7 @@ namespace ariel
                 }
             }
         }
+          this->edgeCount=this->countEdges();
         return *this;
     }
 
@@ -253,6 +282,7 @@ namespace ariel
                 adjacencyMatrix[i][j] += other.adjacencyMatrix[i][j];
             }
         }
+         this->edgeCount=this->countEdges();
         return *this;
     }
     Graph &Graph::operator*=(int scalar)
@@ -264,10 +294,16 @@ namespace ariel
                 adjacencyMatrix[i][j] *= scalar; // Directly modify the matrix
             }
         }
-        return *this; // Return a reference to the current object
+         this->edgeCount=this->countEdges();
+        return *this;
+
     }
     Graph Graph::operator*(const Graph &other) const
     {
+            if (isDirected != other.isDirected)
+        {
+            throw std::invalid_argument("Both graphs must be either directed or undirected to add");
+        }
         if (adjacencyMatrix.size() != other.adjacencyMatrix.size())
         {
             throw std::invalid_argument("Graphs must be of the same dimension to multiply");
@@ -288,6 +324,9 @@ namespace ariel
                 result.adjacencyMatrix[i][i] = 0;
             }
         }
+        
+          result.isDirected = isDirected;
+        result.edgeCount = result.countEdges();
         return result;
     }
     Graph Graph::operator+() const
@@ -301,6 +340,7 @@ namespace ariel
         Graph result;
         result.adjacencyMatrix.resize(adjacencyMatrix.size(), std::vector<int>(adjacencyMatrix.size(), 0));
         result.isDirected = isDirected;
+        result.edgeCount = edgeCount;
         for (size_t i = 0; i < adjacencyMatrix.size(); i++)
         {
             for (size_t j = 0; j < adjacencyMatrix[i].size(); j++)
@@ -308,6 +348,8 @@ namespace ariel
                 result.adjacencyMatrix[i][j] = -adjacencyMatrix[i][j];
             }
         }
+            result.isDirected = isDirected;
+        result.edgeCount = result.countEdges();
         return result;
     }
 
@@ -333,8 +375,8 @@ namespace ariel
             return true;
         if (isContaining(other))
             return false;
-        int edges1 = countEdges();
-        int edges2 = other.countEdges();
+        int edges1 = getEdgeCount();
+        int edges2 = other.getEdgeCount();
         if (edges1 != edges2)
             return edges1 > edges2;
         return adjacencyMatrix.size() > other.adjacencyMatrix.size();
@@ -404,7 +446,7 @@ namespace ariel
     }
     std::ostream &operator<<(std::ostream &os, const Graph &graph)
     {
-        int numEdges = graph.countEdges();
+        int numEdges = graph.getEdgeCount();
         int numVertices = graph.adjacencyMatrix.size();
 
         os << "Graph with " << numVertices << " vertices and " << numEdges << " edges.\n";

@@ -9,6 +9,8 @@ GMAIL : Umanskyvivian@gmail.com
 #include <climits> // For INT_MAX
 #include <algorithm>
 #include <sstream>
+#include <limits>
+
 namespace ariel
 {
     std::string Algorithms::constructPath(const std::vector<int> &path)
@@ -34,7 +36,7 @@ namespace ariel
             // Consider an empty graph as connected.
             return true;
         }
-        if (graph.countEdges() == 0)
+        if (graph.getEdgeCount() == 0)
         {
             return false;
         }
@@ -187,7 +189,7 @@ namespace ariel
     {
         const std::vector<std::vector<int>> &matrix = graph.getAdjacencyMatrix();
         size_t n = matrix.size();
-        if (n == 0 || graph.countEdges() == 0)
+        if (n == 0 || graph.getEdgeCount() == 0)
         {
             // Handle empty graph
             return "No cycle found.";
@@ -343,7 +345,7 @@ namespace ariel
         size_t n = matrix.size();
         std::vector<int> dist, prev;
 
-        if (n == 0 || graph.countEdges() == 0)
+        if (n == 0 || graph.getEdgeCount() == 0)
         {
             // Handle empty graph
             return "No negative cycle found";
@@ -402,7 +404,7 @@ namespace ariel
     {
         const std::vector<std::vector<int>> &matrix = graph.getAdjacencyMatrix();
         size_t n = matrix.size();
-        if (n == 0 || graph.countEdges() == 0)
+        if (n == 0 || graph.getEdgeCount() == 0)
         {
             return "No shortest path in empty graph";
         }
