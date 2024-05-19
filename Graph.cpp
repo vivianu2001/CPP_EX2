@@ -464,7 +464,7 @@ namespace ariel
     std::ostream &operator<<(std::ostream &os, const Graph &graph)
     {
         int numEdges = graph.getEdgeCount();
-        int numVertices = graph.adjacencyMatrix.size();
+        size_t numVertices = graph.adjacencyMatrix.size();
 
         os << "Graph with " << numVertices << " vertices and " << numEdges << " edges.\n";
         os << "The graph is " << (graph.isDirected ? "directed." : "undirected.") << "\n";

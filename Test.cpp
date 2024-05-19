@@ -4,7 +4,7 @@
 
 using namespace std;
 
-TEST_CASE("1-Test graph addition")
+TEST_CASE("Test graph addition")
 {
     ariel::Graph g1;
     vector<vector<int>> graph = {
@@ -25,7 +25,7 @@ TEST_CASE("1-Test graph addition")
         {1, 3, 0}};
     CHECK(g3.printGraph() == "[0, 2, 1]\n[2, 0, 3]\n[1, 3, 0]");
 }
-TEST_CASE("5-Graph subtraction")
+TEST_CASE("Graph subtraction")
 {
     ariel::Graph g1;
     g1.loadGraph({{0, 4, 6, 4},
@@ -52,7 +52,7 @@ TEST_CASE("5-Graph subtraction")
     CHECK(result == expected);
 }
 
-TEST_CASE("2-Test graph multiplication")
+TEST_CASE("Test graph multiplication")
 {
     ariel::Graph g1;
     vector<vector<int>> graph = {
@@ -108,7 +108,7 @@ TEST_CASE("Graph scalar multiplication assignment operator")
     CHECK(g1.getAdjacencyMatrix() == expectedMatrix3);
 }
 
-TEST_CASE("3-Invalid operations")
+TEST_CASE("Invalid operations")
 {
     ariel::Graph g1;
     vector<vector<int>> graph = {
@@ -145,7 +145,7 @@ TEST_CASE("3-Invalid operations")
     CHECK_THROWS(g1 + g6);
 }
 
-TEST_CASE("4-Graph addition with larger matrices")
+TEST_CASE("Graph addition with larger matrices")
 {
     ariel::Graph g1;
     g1.loadGraph({{0, 2, 3, 4},
@@ -172,7 +172,7 @@ TEST_CASE("4-Graph addition with larger matrices")
     CHECK(result == expected);
 }
 
-TEST_CASE("6-Graph comparison operators")
+TEST_CASE("Graph comparison operators")
 {
     ariel::Graph g1;
     g1.loadGraph({{0, 3, 4},
@@ -188,9 +188,9 @@ TEST_CASE("6-Graph comparison operators")
 
     CHECK(g1 == g2); // They are the same
 }
-TEST_CASE("7-Graph with negative cycle")
+TEST_CASE("Graph with negative cycle")
 {
-    ariel::Graph g;
+    ariel::Graph g, g2;
     std::vector<std::vector<int>> graph = {
         {0, 1, 0},
         {0, 0, 1},
@@ -205,9 +205,24 @@ TEST_CASE("7-Graph with negative cycle")
     CHECK(ariel::Algorithms::isBipartite(g) == "The graph is not bipartite.");
     CHECK(ariel::Algorithms::isContainsCycle(g) == "The cycle is: 0->1->2->0");
     CHECK(ariel::Algorithms::isConnected(g) == true);
+    vector<vector<int>> weightedGraph = {
+        {0, 2, 0},
+        {0, 0, 2},
+        {-2, 0, 0}};
+    g2.loadGraph(weightedGraph, true);
+    g -= g2;
+    CHECK(ariel::Algorithms::negativeCycle(g) == "No negative cycle found");
+    CHECK(ariel::Algorithms::isBipartite(g) == "The graph is bipartite: A={0, 1, 2}, B={}");
+    CHECK(ariel::Algorithms::isContainsCycle(g) == "No cycle found.");
+    CHECK(ariel::Algorithms::isConnected(g) == false);
+    g += ++ ++ ++g2;
+    CHECK(ariel::Algorithms::negativeCycle(g) == "No negative cycle found");
+    CHECK(ariel::Algorithms::isBipartite(g) == "The graph is bipartite: A={0, 2}, B={1}");
+    CHECK(ariel::Algorithms::isContainsCycle(g) == "No cycle found.");
+    CHECK(ariel::Algorithms::isConnected(g) == false);
 }
 
-TEST_CASE("8-Graph comparison operators")
+TEST_CASE("Graph comparison operators")
 {
     ariel::Graph g1;
     g1.loadGraph({{0, 3, 4},
@@ -224,7 +239,7 @@ TEST_CASE("8-Graph comparison operators")
     CHECK(g1 == g2); // They are the same
 }
 
-TEST_CASE("9-Graph comparison operators")
+TEST_CASE("Graph comparison operators")
 {
     ariel::Graph g1;
     g1.loadGraph({{0, 3, 4},
@@ -297,7 +312,7 @@ TEST_CASE("Clique-k5")
     g10.loadGraph(graph10, false);
     CHECK(g10 < g9);
 }
-TEST_CASE("7-Clique-k3")
+TEST_CASE("Clique-k3")
 {
     ariel::Graph g11;
     vector<vector<int>> graph11 = {
@@ -323,7 +338,7 @@ TEST_CASE("7-Clique-k3")
     CHECK(g12 <= g11);
 }
 
-TEST_CASE("9-Clique-k6")
+TEST_CASE("Clique-k6")
 {
     ariel::Graph g11;
     vector<vector<int>> graph11 = {
@@ -350,7 +365,7 @@ TEST_CASE("9-Clique-k6")
     g12.loadGraph(graph12, false);
     CHECK(g12 < g11);
 }
-TEST_CASE("10-Weighted graph")
+TEST_CASE("Weighted graph")
 {
     ariel::Graph g11;
     vector<vector<int>> graph11 = {
@@ -374,7 +389,7 @@ TEST_CASE("10-Weighted graph")
     CHECK(ariel::Algorithms::shortestPath(g11, 5, 1) == "No path available");
     CHECK(ariel::Algorithms::shortestPath(g11, 6, 8) == "No path available");
 }
-TEST_CASE("11-Test graph addition post decrement")
+TEST_CASE("Test graph addition post decrement")
 {
     ariel::Graph g1;
     vector<vector<int>> graph = {
@@ -394,7 +409,7 @@ TEST_CASE("11-Test graph addition post decrement")
     CHECK(g1.printGraph() == "[0, 9, 0]\n[9, 0, 9]\n[0, 9, 0]");
 }
 
-TEST_CASE("11-Test graph addition pre decrement")
+TEST_CASE("Test graph addition pre decrement")
 {
     ariel::Graph g1;
     vector<vector<int>> graph = {
@@ -413,7 +428,7 @@ TEST_CASE("11-Test graph addition pre decrement")
     CHECK(g3.printGraph() == "[0, 10, 1]\n[10, 0, 11]\n[1, 11, 0]");
 }
 
-TEST_CASE("13-Directed graph")
+TEST_CASE("Directed graph")
 {
     ariel::Graph g11;
     vector<vector<int>> graph11 = {
@@ -434,7 +449,7 @@ TEST_CASE("13-Directed graph")
     CHECK(ariel::Algorithms::isBipartite(g12) == "The graph is not bipartite.");
     CHECK(ariel::Algorithms::isConnected(g12) == false);
 }
-TEST_CASE("14-Directed graph")
+TEST_CASE("Directed graph")
 {
     ariel::Graph g11;
     vector<vector<int>> graph11 = {
@@ -456,6 +471,7 @@ TEST_CASE("14-Directed graph")
     CHECK(ariel::Algorithms::isContainsCycle(g11) == "The cycle is: 0->2->1->0");
     CHECK(ariel::Algorithms::isConnected(g12) == false);
 }
+
 TEST_CASE("Graph subtraction assignment operator")
 {
     // Setting up the initial graphs
@@ -550,6 +566,99 @@ TEST_CASE("Graph comparison operators")
     CHECK_FALSE(g3 > g1);
     CHECK_FALSE(g3 > g1);
     CHECK_FALSE(g1 < g2);
+}
+TEST_CASE("Complex operation - Adding, subtracting, and scalar multiplication")
+{
+    ariel::Graph g1;
+    g1.loadGraph({{0, 1},
+                  {1, 0}},
+                 false);
+
+    ariel::Graph g2;
+    g2.loadGraph({{0, 2},
+                  {2, 0}},
+                 false);
+
+    ariel::Graph g3;
+    g3.loadGraph({{0, 1},
+                  {1, 0}},
+                 false);
+
+    ariel::Graph result = ((g1 + g2) *= 2) - g3;
+
+    ariel::Graph expected;
+    expected.loadGraph({{0, 5},
+                        {5, 0}},
+                       false);
+
+    CHECK(result == expected);
+}
+
+TEST_CASE("Complex operation - Increment and addition with scalar multiplication")
+{
+    ariel::Graph g1;
+    g1.loadGraph({{0, 1},
+                  {1, 0}},
+                 false);
+
+    ariel::Graph g2;
+    g2.loadGraph({{0, 2},
+                  {2, 0}},
+                 false);
+
+    ariel::Graph result = ++g1 + (g2 *= 3);
+
+    ariel::Graph expected;
+    expected.loadGraph({{0, 8},
+                        {8, 0}},
+                       false);
+
+    CHECK(result == expected);
+}
+
+TEST_CASE("Complex operation - Decrement and subtraction with unary minus")
+{
+    ariel::Graph g1;
+    g1.loadGraph({{0, 2},
+                  {2, 0}},
+                 false);
+
+    ariel::Graph g2;
+    g2.loadGraph({{0, 1},
+                  {1, 0}},
+                 false);
+
+    ariel::Graph result = --g1 - (-g2);
+
+    ariel::Graph expected;
+    expected.loadGraph({{0, 2},
+                        {2, 0}},
+                       false);
+
+    CHECK(result == expected);
+}
+
+TEST_CASE("Complex operation - In-place addition and subtraction with increment and decrement")
+{
+    ariel::Graph g1;
+    g1.loadGraph({{0, 1},
+                  {1, 0}},
+                 false);
+
+    ariel::Graph g2;
+    g2.loadGraph({{0, 2},
+                  {2, 0}},
+                 false);
+
+    g1 += ++g2; // g1=4 g2=3
+    g1 -= --g2; //
+
+    ariel::Graph expected;
+    expected.loadGraph({{0, 2},
+                        {2, 0}},
+                       false);
+
+    CHECK(g1 == expected);
 }
 
 TEST_CASE("Edge case - empty graphs")
@@ -646,97 +755,4 @@ TEST_CASE("Edge case - Equality of graphs with different edges")
                  false);
 
     CHECK(g1 != g2);
-}
-TEST_CASE("Complex operation - Adding, subtracting, and scalar multiplication")
-{
-    ariel::Graph g1;
-    g1.loadGraph({{0, 1},
-                  {1, 0}},
-                 false);
-
-    ariel::Graph g2;
-    g2.loadGraph({{0, 2},
-                  {2, 0}},
-                 false);
-
-    ariel::Graph g3;
-    g3.loadGraph({{0, 1},
-                  {1, 0}},
-                 false);
-
-    ariel::Graph result = ((g1 + g2) *= 2) - g3;
-
-    ariel::Graph expected;
-    expected.loadGraph({{0, 5},
-                        {5, 0}},
-                       false);
-
-    CHECK(result == expected);
-}
-
-TEST_CASE("Complex operation - Increment and addition with scalar multiplication")
-{
-    ariel::Graph g1;
-    g1.loadGraph({{0, 1},
-                  {1, 0}},
-                 false);
-
-    ariel::Graph g2;
-    g2.loadGraph({{0, 2},
-                  {2, 0}},
-                 false);
-
-    ariel::Graph result = ++g1 + (g2 *= 3);
-
-    ariel::Graph expected;
-    expected.loadGraph({{0, 8},
-                        {8, 0}},
-                       false);
-
-    CHECK(result == expected);
-}
-
-TEST_CASE("Complex operation - Decrement and subtraction with unary minus")
-{
-    ariel::Graph g1;
-    g1.loadGraph({{0, 2},
-                  {2, 0}},
-                 false);
-
-    ariel::Graph g2;
-    g2.loadGraph({{0, 1},
-                  {1, 0}},
-                 false);
-
-    ariel::Graph result = --g1 - (-g2);
-
-    ariel::Graph expected;
-    expected.loadGraph({{0, 2},
-                        {2, 0}},
-                       false);
-
-    CHECK(result == expected);
-}
-
-TEST_CASE("Complex operation - In-place addition and subtraction with increment and decrement")
-{
-    ariel::Graph g1;
-    g1.loadGraph({{0, 1},
-                  {1, 0}},
-                 false);
-
-    ariel::Graph g2;
-    g2.loadGraph({{0, 2},
-                  {2, 0}},
-                 false);
-
-    g1 += ++g2; // g1=4 g2=3
-    g1 -= --g2; //
-
-    ariel::Graph expected;
-    expected.loadGraph({{0, 2},
-                        {2, 0}},
-                       false);
-
-    CHECK(g1 == expected);
 }
