@@ -120,6 +120,10 @@ namespace ariel
     }
     void Graph::checkCompatibility(const Graph &other) const
     {
+        if (adjacencyMatrix.empty() || other.adjacencyMatrix.empty())
+        {
+            throw std::invalid_argument("Graphs must not be empty.");
+        }
         if (isDirected != other.isDirected)
         {
             throw std::invalid_argument("Both graphs must be either directed or undirected.");
@@ -134,6 +138,13 @@ namespace ariel
             {
                 throw std::invalid_argument("Graph rows must be of the same length.");
             }
+        }
+    }
+    void Graph::checkCompatibility() const
+    {
+        if (adjacencyMatrix.empty())
+        {
+            throw std::invalid_argument("Graphs must not be empty.");
         }
     }
 
@@ -156,7 +167,7 @@ namespace ariel
 
         return result;
     }
-    // Graph operator- (Subtraction)
+
     Graph Graph::operator-(const Graph &other) const
     {
         checkCompatibility(other);
@@ -176,11 +187,10 @@ namespace ariel
         return result;
     }
 
-    // Graph operator-= (Subtraction Assignment)
     Graph &Graph::operator-=(const Graph &other)
     {
         checkCompatibility(other);
-        
+
         for (size_t i = 0; i < adjacencyMatrix.size(); i++)
         {
             for (size_t j = 0; j < adjacencyMatrix[i].size(); j++)
@@ -191,56 +201,6 @@ namespace ariel
         this->edgeCount = this->countEdges();
         return *this;
     }
-    /// Pre-increment
-    Graph &Graph::operator++()
-    {
-        for (auto &row : adjacencyMatrix)
-        {
-            for (auto &val : row)
-            {
-                if (val != 0)
-                { // Increment only if the value is not 0
-                    ++val;
-                }
-            }
-        }
-        this->edgeCount = this->countEdges();
-        return *this;
-    }
-
-    // Post-increment
-    Graph Graph::operator++(int)
-    {
-        Graph temp = *this; // Make a copy of the current state
-        ++(*this);          // Use the pre-increment
-        return temp;
-    }
-
-    // Pre-decrement
-    Graph &Graph::operator--()
-    {
-        for (auto &row : adjacencyMatrix)
-        {
-            for (auto &val : row)
-            {
-                if (val != 0)
-                { // Decrement only if the value is not 0
-                    --val;
-                }
-            }
-        }
-        this->edgeCount = this->countEdges();
-        return *this;
-    }
-
-    // Post-decrement
-    Graph Graph::operator--(int)
-    {
-        Graph temp = *this; // Make a copy of the current state
-        --(*this);          // Use the pre-decrement
-        return temp;
-    }
-
     Graph &Graph::operator+=(const Graph &other)
     {
         checkCompatibility(other);
@@ -256,6 +216,7 @@ namespace ariel
     }
     Graph &Graph::operator*=(int scalar)
     {
+        checkCompatibility();
         for (size_t i = 0; i < adjacencyMatrix.size(); i++)
         {
             for (size_t j = 0; j < adjacencyMatrix[i].size(); j++)
@@ -279,7 +240,6 @@ namespace ariel
             {
                 for (size_t k = 0; k < n; k++)
                 {
-                   
 
                     result.adjacencyMatrix[i][j] += adjacencyMatrix[i][k] * other.adjacencyMatrix[k][j];
                 }
@@ -292,14 +252,73 @@ namespace ariel
         result.edgeCount = result.countEdges();
         return result;
     }
+    /// Pre-increment
+    Graph &Graph::operator++()
+    {
+        checkCompatibility();
+        for (auto &row : adjacencyMatrix)
+        {
+            for (auto &val : row)
+            {
+                if (val != 0)
+                { // Increment only if the value is not 0
+                    ++val;
+                }
+            }
+        }
+        this->edgeCount = this->countEdges();
+        return *this;
+    }
+
+    // Post-increment
+    Graph Graph::operator++(int)
+    {
+        checkCompatibility();
+        Graph temp = *this; // Make a copy of the current state
+        ++(*this);          // Use the pre-increment
+        return temp;
+    }
+
+    // Pre-decrement
+    Graph &Graph::operator--()
+    {
+        checkCompatibility();
+        for (auto &row : adjacencyMatrix)
+        {
+            for (auto &val : row)
+            {
+                if (val != 0)
+                { // Decrement only if the value is not 0
+                    --val;
+                }
+            }
+        }
+        this->edgeCount = this->countEdges();
+        return *this;
+    }
+
+    // Post-decrement
+    Graph Graph::operator--(int)
+    {
+        checkCompatibility();
+        Graph temp = *this; // Make a copy of the current state
+        --(*this);          // Use the pre-decrement
+        return temp;
+    }
+
+    // Unary +
     Graph Graph::operator+() const
     {
+        checkCompatibility();
+
         // Returns a copy of the graph as it is
         Graph result = *this;
         return result;
     }
+    // Unary -
     Graph Graph::operator-() const
     {
+        checkCompatibility();
         Graph result;
         result.adjacencyMatrix.resize(adjacencyMatrix.size(), std::vector<int>(adjacencyMatrix.size(), 0));
         result.isDirected = isDirected;
@@ -318,6 +337,15 @@ namespace ariel
 
     bool Graph::operator==(const Graph &other) const
     {
+        if (adjacencyMatrix.empty() || other.adjacencyMatrix.empty())
+        {
+            throw std::invalid_argument("Graphs must not be empty.");
+        }
+
+        if (isDirected != other.isDirected)
+        {
+            return false;
+        }
         if (adjacencyMatrix.size() != other.adjacencyMatrix.size())
             return false;
         for (size_t i = 0; i < adjacencyMatrix.size(); i++)
@@ -334,14 +362,40 @@ namespace ariel
     }
     bool Graph::operator>(const Graph &other) const
     {
+        if (adjacencyMatrix.empty() || other.adjacencyMatrix.empty())
+        {
+            throw std::invalid_argument("Graphs must not be empty.");
+        }
+        // If this graph contains the other graph as a subgraph but is not equal, return true
         if (isContained(other))
             return true;
+
+        // If the other graph contains this graph as a subgraph but is not equal, return false
         if (isContaining(other))
             return false;
+
+        // Compare the number of edges
         int edges1 = getEdgeCount();
         int edges2 = other.getEdgeCount();
         if (edges1 != edges2)
             return edges1 > edges2;
+
+        // If the number of edges is the same, compare the total weights of the edges
+        int totalWeight1 = 0;
+        int totalWeight2 = 0;
+        for (size_t i = 0; i < adjacencyMatrix.size(); i++)
+        {
+            for (size_t j = 0; j < adjacencyMatrix[i].size(); j++)
+            {
+                totalWeight1 += adjacencyMatrix[i][j];
+                totalWeight2 += other.adjacencyMatrix[i][j];
+            }
+        }
+
+        if (totalWeight1 != totalWeight2)
+            return totalWeight1 > totalWeight2;
+
+        // If the total weights are also the same, compare the sizes of the adjacency matrices
         return adjacencyMatrix.size() > other.adjacencyMatrix.size();
     }
 

@@ -18,6 +18,7 @@ namespace ariel
         bool isContaining(const Graph &other) const;
         int countEdges();
         void checkCompatibility(const Graph &other) const;
+        void checkCompatibility() const;
 
     public:
         Graph();
@@ -53,7 +54,6 @@ namespace ariel
         bool operator<(const Graph &other) const;
         bool operator>=(const Graph &other) const;
         bool operator<=(const Graph &other) const;
-        
 
         // Output operator
         friend std::ostream &operator<<(std::ostream &os, const Graph &graph);
