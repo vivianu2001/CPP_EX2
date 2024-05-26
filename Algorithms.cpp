@@ -382,7 +382,7 @@ namespace ariel
                     if (matrix[u][v] != 0 && dist[u] + matrix[u][v] < dist[v])
                     {
                         std::vector<int> cycle;
-                        int x = v;
+                        int x = static_cast<int>(v);
                         do
                         {
                             cycle.push_back(static_cast<int>(x));

@@ -20,7 +20,6 @@ clean:
 	rm -f $(OBJECTS) program
 
 tidy:
-	clang-tidy $(SOURCES) -checks=bugprone-*,clang-analyzer-*,performance-*,portability-*,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-owning-memory --warnings-as-errors=-* --
-
+	clang-tidy Graph.cpp Algorithms.cpp Demo.cpp Test.cpp main.cpp -checks=bugprone-*,clang-analyzer-*,performance-*,portability-*,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-owning-memory --warnings-as-errors=-* -header-filter='^/home/vivian/CPP_EX2.*' --
 
 .PHONY: all run program clean tidy valgrind
