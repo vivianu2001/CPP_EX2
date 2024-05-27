@@ -136,13 +136,7 @@ namespace ariel
         {
             throw std::invalid_argument("Graphs must be of the same size.");
         }
-        for (size_t i = 0; i < adjacencyMatrix.size(); ++i)
-        {
-            if (adjacencyMatrix[i].size() != other.adjacencyMatrix[i].size())
-            {
-                throw std::invalid_argument("Graph rows must be of the same length.");
-            }
-        }
+    
     }
     void Graph::checkCompatibility() const
     {
@@ -370,6 +364,7 @@ namespace ariel
         {
             throw std::invalid_argument("Graphs must not be empty.");
         }
+    
         // If this graph contains the other graph as a subgraph but is not equal, return true
         if (isContained(other))
             return true;
